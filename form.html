@@ -4,6 +4,7 @@
 <script type="text/javascript">
 function OnInput (event) {
 	var textdata = event.target.value;
+	document.getElementById('errorbox').display= 'hide';
 	var phpurl = 'calldatastore.php?searchtext=' + textdata;
 	getRequest(
 		phpurl,
@@ -12,13 +13,17 @@ function OnInput (event) {
 	);
 }
 function drawError() {
-	var container = document.getElementById('output');
-	container.innerHTML = 'Oops, there was an error';
+	var container = document.getElementById('names');
+	document.getElementById('errorbox').innerHTML = 'No Results found';
+	document.getElementById('errorbox').display = 'block' ;
 }
 function drawOutput(responseText) {
 	var container = document.getElementById('names');
-	#container.innerHTML = responseText;
-	document.getElementById('names').innerHTML = responseText;
+	var response = JSON.parse(responseText, function(k,v){return v; });
+	console.log(response["tailored_results"]);
+	document.getElementById('names').innerHTML = response["tailored_results"];
+	document.getElementById('errorbox').innerHTML = "Total Results found:"+response["total_results"];
+        document.getElementById('errorbox').display = 'block' ;	
 
 }
 function getRequest(url, success, error) {
@@ -62,13 +67,12 @@ function getRequest(url, success, error) {
 </head>
 <body>
 <form action="upload.php" method="post" enctype="multipart/form-data" style="font-family:Tahoma">
-	Type your search text here:<br/><br/>
-	<input type="text" oninput="OnInput(event);" onpropertychange="OnPropChanged(event);" autofocus><br/>
+<div id='errorbox'>Welcome</div>
+	
+Type your search text here:<br/><br/>
+	<input type="text" list="names"  oninput="OnInput(event);" onpropertychange="OnPropChanged(event);" autofocus><br/>
 	<br/>
-	<input list="names" name="names">
 	<datalist id="names"></datalist>
-
-	<div id="output" style="border: 1px solid black">Watch out for AJAX output here</div>
 </form>
 </body>
 </html>

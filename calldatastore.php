@@ -8,14 +8,14 @@ try
 	$mem = new Memcached();
 	$mem->addServer("127.0.0.1", 11211);
 
-	$projectId = 'triple-cab-162115';
+	$projectId = 'lofty-cabinet-181300';
 	$datastore = new DatastoreClient([
 	    'projectId' => $projectId
 	]);
 
-	echo 'Matches:<br/>';
+	#echo 'Matches:<br/>';
 	$matches_string = "";
-
+	$responseArr = array();
 	//Get the string typed in by user for autocompletion...
 	$queryval = strtolower($_GET['searchtext']);
 
@@ -27,7 +27,7 @@ try
 		if ($cache_hit) {
 
 			//yes! we have it it cache, no need to go back to datastore...
-			$matches_string = (string) $cache_hit;
+			$responseArr = (array) $cache_hit;
 		} else {
 
 			//cache miss, let us go to datastore and fetch the result...
@@ -38,16 +38,32 @@ try
 				->filter('name', '<', $upperlimit)
 				->order('name');
 			$result = $datastore->runQuery($query);
+			$counter = 1;
+			$count = 0;	
 			foreach ($result as $SKU) {
-				$matches_string = " <option value="$matches_string . $SKU['name'] . ">";
+			$count++;
 			}
-
+			foreach ($result as $SKU) {
+ 			$counter = $counter + 1;
+			if ($counter == 10)
+			{
+				break;
+			}
+			else
+			{
+			$matches_string = $matches_string . '<option value="' . $SKU['name'] . '">';
+	}
+	}
+			$responseArr = array(
+			"tailored_results" => $matches_string,
+			"total_results" => $count
+			);
 			//finally, let us insert this query result in our local cache so that next time,
 			//we do not have to make a round-trip to datastore - note that we are caching for 7 days
-			$mem->set($queryval, $matches_string, 604800);
+			$mem->set($queryval, $responseArr, 604800);
 		}
-		echo $matches_string;
-	}
+		echo json_encode($responseArr);
+}
 } catch (Exception $e) {
 	echo 'Caught exception: ',  $e->getMessage(), "\n";
 }
