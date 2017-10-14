@@ -39,7 +39,7 @@ try
 				->order('name');
 			$result = $datastore->runQuery($query);
 			foreach ($result as $SKU) {
-				$matches_string = $matches_string . $SKU['name'] . "<br/>";
+				$matches_string = " <option value="$matches_string . $SKU['name'] . ">";
 			}
 
 			//finally, let us insert this query result in our local cache so that next time,

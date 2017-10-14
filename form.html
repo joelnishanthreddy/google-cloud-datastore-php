@@ -16,8 +16,10 @@ function drawError() {
 	container.innerHTML = 'Oops, there was an error';
 }
 function drawOutput(responseText) {
-	var container = document.getElementById('output');
-	container.innerHTML = responseText;
+	var container = document.getElementById('names');
+	#container.innerHTML = responseText;
+	document.getElementById('names').innerHTML = responseText;
+
 }
 function getRequest(url, success, error) {
     var req = false;
@@ -63,6 +65,9 @@ function getRequest(url, success, error) {
 	Type your search text here:<br/><br/>
 	<input type="text" oninput="OnInput(event);" onpropertychange="OnPropChanged(event);" autofocus><br/>
 	<br/>
+	<input list="names" name="names">
+	<datalist id="names"></datalist>
+
 	<div id="output" style="border: 1px solid black">Watch out for AJAX output here</div>
 </form>
 </body>
